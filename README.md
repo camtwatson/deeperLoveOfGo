@@ -21,6 +21,7 @@ Saved reference checkpoints preserving the state of the code at the end of each 
 * **`ch1/`**: First programs, packages, imports, and basic functions.
 * **`ch2/`**: Variables, types, and struct definitions.
 * **`ch3/`**: Structuring packages, setting up `go.mod`, and writing tests with the standard `testing` package.
+* **`ch4/`**: Slices (`[]Book`), unique IDs, catalog lookups (`GetAllBooks`, `GetBook`), multi-value returns / comma-ok idiom (`(Book, bool)`), `slices.Equal`, and `t.Parallel()`.
 
 ### 3. `chapterChecks/`
 Targeted practice problems and challenges to verify understanding before moving to the next topic:

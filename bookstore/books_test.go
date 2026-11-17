@@ -2,8 +2,10 @@ package books_test
 
 import "testing"
 import "books"
+import "slices"
 
 func TestBookToString_FormatsBookInfoAsString(t *testing.T) {
+	t.Parallel()
 	input := books.Book{
 		Title: "Sea Room",
 		Author: "Adam Nicolson",
@@ -13,5 +15,59 @@ func TestBookToString_FormatsBookInfoAsString(t *testing.T) {
 	got := books.BookToString(input)
 	if want != got {
 		t.Fatalf("want %q, got %q", want, got)
+	}
+}
+
+func TestGetAllBooks_ListBooks(t *testing.T) {
+	t.Parallel()
+	want := []books.Book{
+		{
+			Title: "In the Company of Cheerful Ladies",
+			Author: "Alexander McCall Smith",
+			Copies: 1,
+			ID: "3aqfr",
+		},
+		{
+			Title: "White Heat",
+			Author: "Dominic Sandbrook",
+			Copies: 2,
+			ID: "5ytr7",
+		},
+	}
+
+	got := books.GetAllBooks()
+
+	if !slices.Equal(want, got) {
+		t.Fatalf("want: %#v, got %#v", want, got)
+	}
+	
+	
+}
+
+func TestGetBook_FindBookByID(t *testing.T) {
+	t.Parallel()
+	want := books.Book{
+			ID: "3aqfr",
+			Title: "In the Company of Cheerful Ladies",
+			Author: "Alexander McCall Smith",
+			Copies: 1,
+	}
+
+	got, ok := books.GetBook("3aqfr")
+	if !ok {
+		t.Fatal("Book not found")
+	}
+
+	if want != got {
+		t.Fatalf("want %#v, got %#v", want, got)
+	}
+
+}
+
+func TestGetBook_ReturnsFalseWhenBookNotFound(t *testing.T) {
+	t.Parallel()
+	_, ok := books.GetBook("nonexistent ID")
+	if ok {
+		t.Fatal("want false for nonexistent ID, got true")
 	}
 }
