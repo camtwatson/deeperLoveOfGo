@@ -1,8 +1,28 @@
 package books_test
 
-import "testing"
-import "books"
-import "slices"
+import (
+	"books"
+	"cmp"
+	"slices"
+	"testing"
+)
+
+func getTestCatalog() map[string]books.Book{
+		return map[string]books.Book{
+		"abc": {
+			Title: "In the Company of Cheerful Ladies",
+			Author: "Alexander McCall Smith",
+			Copies: 1,
+			ID: "abc",
+		},
+		"xyz": {
+			Title: "White Heat",
+			Author: "Dominic Sandbrook",
+			Copies: 2,
+			ID: "xyz",
+		},
+	}
+}
 
 func TestBookToString_FormatsBookInfoAsString(t *testing.T) {
 	t.Parallel()
@@ -20,22 +40,26 @@ func TestBookToString_FormatsBookInfoAsString(t *testing.T) {
 
 func TestGetAllBooks_ListBooks(t *testing.T) {
 	t.Parallel()
+	catalog := getTestCatalog()
 	want := []books.Book{
 		{
 			Title: "In the Company of Cheerful Ladies",
 			Author: "Alexander McCall Smith",
 			Copies: 1,
-			ID: "3aqfr",
+			ID: "abc",
 		},
 		{
 			Title: "White Heat",
 			Author: "Dominic Sandbrook",
 			Copies: 2,
-			ID: "5ytr7",
+			ID: "xyz",
 		},
 	}
 
-	got := books.GetAllBooks()
+	got := books.GetAllBooks(catalog)
+	slices.SortFunc(got, func(a, b books.Book) int {
+		return cmp.Compare(a.Author, b.Author)
+	})
 
 	if !slices.Equal(want, got) {
 		t.Fatalf("want: %#v, got %#v", want, got)
@@ -46,14 +70,15 @@ func TestGetAllBooks_ListBooks(t *testing.T) {
 
 func TestGetBook_FindBookByID(t *testing.T) {
 	t.Parallel()
+	catalog := getTestCatalog()
 	want := books.Book{
-			ID: "3aqfr",
+			ID: "abc",
 			Title: "In the Company of Cheerful Ladies",
 			Author: "Alexander McCall Smith",
 			Copies: 1,
 	}
 
-	got, ok := books.GetBook("3aqfr")
+	got, ok := books.GetBook(catalog, "abc")
 	if !ok {
 		t.Fatal("Book not found")
 	}
@@ -66,8 +91,29 @@ func TestGetBook_FindBookByID(t *testing.T) {
 
 func TestGetBook_ReturnsFalseWhenBookNotFound(t *testing.T) {
 	t.Parallel()
-	_, ok := books.GetBook("nonexistent ID")
+	catalog := getTestCatalog()
+	_, ok := books.GetBook(catalog, "nonexistent ID")
 	if ok {
 		t.Fatal("want false for nonexistent ID, got true")
 	}
+}
+
+func TestAddBook_CreatesNewBookInInventory(t *testing.T) {
+	t.Parallel()
+	catalog := getTestCatalog()
+	_, ok := books.GetBook(catalog, "123")
+	if ok {
+		t.Fatal("book already present")
+	}
+	books.AddBook(catalog, books.Book{
+		ID: "123",
+		Title: "The Prize of all the Oceans",
+		Author: "Glyn Williams",
+		Copies: 2,
+	})
+	_, ok = books.GetBook(catalog, "123")
+	if !ok {
+		t.Fatal("added book not found")
+	}
+
 }

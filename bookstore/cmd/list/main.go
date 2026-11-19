@@ -1,10 +1,13 @@
 package main
 
-import "fmt"
-import "books"
+import (
+	"books"
+	"fmt"
+)
 
 func main() {
-	for _, book := range books.GetAllBooks() {
+	catalog := books.GetCatalog()
+	for _, book := range books.GetAllBooks(catalog) {
 		fmt.Println(books.BookToString(book))
 	}
 }
